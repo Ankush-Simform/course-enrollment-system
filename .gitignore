@@ -19,3 +19,7 @@ vendor/
 tmp.php
 composer.json
 composer.lock
+/public/api/teachers_api.php
+/public/api/students_Api.php
+/public/api/enrollments_api.php
+/public/api/courses_api.php

@@ -20,7 +20,7 @@ $db = $database->connect();
 $userObj = new User($db);
 
 $error = "";
-$success = "";
+$success = ""; 
 $showOtpField = false;
 
 if (isset($_POST['send_otp'])) {
