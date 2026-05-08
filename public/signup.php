@@ -8,10 +8,6 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 use PHPMailer\PHPMailer\SMTP;
 
-require __DIR__ . '/../libs/PHPMailer-master/src/Exception.php';
-require __DIR__ . '/../libs/PHPMailer-master/src/PHPMailer.php';
-require __DIR__ . '/../libs/PHPMailer-master/src/SMTP.php';
-
 require_once '../config/database.php';
 require_once '../classes/User.php';
 
