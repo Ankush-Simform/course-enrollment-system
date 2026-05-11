@@ -26,5 +26,6 @@
 </style>
 
 <div class="main-wrapper">
-    <div class="content-box">
-        
+    <!-- <div class="content-box"> -->
+    </div>
+</div>

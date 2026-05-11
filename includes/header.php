@@ -3,8 +3,19 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-$role = $_SESSION['role_id'] ?? ''; 
+$role = $_SESSION['role_id'] ?? 'null'; 
 ?>
+
+
+<?php if ($role == 1): ?>
+    <a href="../public/dashboard.php">Admin</a>
+
+<?php elseif ($role == 2): ?>
+    <a href="teacher_dashboard.php">Teacher</a>
+
+<?php endif; ?>
+ <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css">
+
 
 <header style="
 background: #f7f5f1;
@@ -64,3 +75,54 @@ background: #f7f5f1;
         <?php endif; ?>
     </div>
 </header>
+
+<!-- jQuery FIRST -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css">
+
+<!-- DataTables core -->
+<script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+
+<!-- Buttons extension -->
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+
+<!-- <script>
+let table;
+
+$(document).ready(function () {
+  table = $("#table").DataTable({
+    destroy: true, // it will destroy the datatables if already exists in the table
+    "searching":true,
+
+    "paging":true,
+    "pageLength":5,
+    "columnDefs":[{
+        "targets":[3],
+        "orderable":true   
+    },
+    {
+      "targets":[],
+      "visible":false,
+      "searchable":true 
+    }
+  ],
+    
+    dom:'Bfrtip', 
+    
+    buttons:[
+      'copy','csv','excel','pdf','print'
+    ]
+  });
+});
+</script> -->

@@ -19,17 +19,17 @@ class Database
     }
 
     public function connect()
-{
-    try {
-        $pdo = new PDO(
-            "mysql:host={$this->host};port={$this->port};dbname={$this->db_name}",
-            $this->username,
-            $this->password,
-            [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
-        );
-        return $pdo;
-    } catch (PDOException $e) {
-        exit("Database Error: " . $e->getMessage()); 
+    {
+        try {
+            $pdo = new PDO(
+                "mysql:host={$this->host};port={$this->port};dbname={$this->db_name}",
+                $this->username,
+                $this->password,
+                [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
+            );
+            return $pdo;
+        } catch (PDOException $e) {
+            exit("Database Error: " . $e->getMessage());
+        }
     }
-}
 }

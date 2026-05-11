@@ -14,9 +14,11 @@
         }
 
         $db = (new Database())->connect();
+
         $student_id = $_SESSION['user_id'];
 
         $action = $_POST['action'] ?? '';
+        
         $course_id = (int)($_POST['course_id'] ?? 0);
 
         if ($action === 'enroll') {
@@ -217,7 +219,7 @@
 	    <?php foreach ($allCourses as $c): ?>
 	        <tr data-id="<?= $c['id'] ?>">
 	            <td><?= htmlspecialchars($c['course_name']) ?></td>
-	            <td><?= htmlspecialchars($c['teacher'] ?? 'TBA') ?></td>
+	            <td><?= htmlspecialchars($c['teacher'] ?? '') ?></td>
 	            <td class="seat-cell">
 	                <?= $c['current_enrolled'] ?>/<?= $c['max_seats'] ?>
 	            </td>

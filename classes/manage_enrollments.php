@@ -58,7 +58,7 @@ $list = $enrollManager->getAll();
     </a>
 </div>
 
-<table border="1" cellpadding="10"
+<table border="1" cellpadding="10" id= "table"
        style="width:100%;border-collapse:collapse;margin-top:20px;">
 
     <thead style="background:#333;color:#fff;">
@@ -156,3 +156,32 @@ $list = $enrollManager->getAll();
 </table>
 
 <?php require_once '../includes/footer.php'; ?>
+
+<script>
+let table;
+
+$(document).ready(function () {
+  table = $("#table").DataTable({
+    destroy: true, // it will destroy the datatables if already exists in the table
+    "searching":true,
+    "paging":true,
+    "pageLength":5,
+    "columnDefs":[{
+        "targets":[3],
+        "orderable":true   
+    },
+    {
+      "targets":[],
+      "visible":false,
+      "searchable":true 
+    }
+  ],
+    
+    dom:'Bfrtip', 
+    
+    buttons:[
+      'copy','csv','excel','pdf','print'
+    ]
+  });
+});
+</script>

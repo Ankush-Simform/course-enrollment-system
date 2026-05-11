@@ -1,99 +1,147 @@
 <?php
-require_once '../config/database.php';
-include '../includes/header.php';
-include '../includes/body_top.php';
-
-if (!isset($_SESSION['role_id']) || $_SESSION['role_id'] != 1) {
-    die("Unauthorized access.");
-}
-
-$db = (new Database())->connect();
-
-/*
-|--------------------------------------------------------------------------
-| Validate Type
-|--------------------------------------------------------------------------
-*/
-$allowedTypes = ['students', 'teachers'];
+session_start();
 $type = $_GET['type'] ?? 'students';
-
-if (!in_array($type, $allowedTypes, true)) {
-    $type = 'students';
-}
-
-$page = max(1, (int)($_GET['page'] ?? 1));
-
-$limit = 10;
-$offset = ($page - 1) * $limit;
-
-$role_id = ($type === 'teachers') ? 2 : 3;
-
-$stmt = $db->prepare("SELECT COUNT(*) FROM users WHERE role_id = ?");
-$stmt->execute([$role_id]);
-$totalRows = $stmt->fetchColumn();
-
-$totalPages = max(1, ceil($totalRows / $limit));
-
-$stmt = $db->prepare("
-    SELECT id, name, email
-    FROM users
-    WHERE role_id = ?
-    LIMIT ? OFFSET ?
-");
-
-$stmt->bindValue(1, $role_id, PDO::PARAM_INT);
-$stmt->bindValue(2, $limit, PDO::PARAM_INT);
-$stmt->bindValue(3, $offset, PDO::PARAM_INT);
-$stmt->execute();
-
-$users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$_SESSION['csrf_token'] = $_SESSION['csrf_token'] ?? bin2hex(random_bytes(32));
 ?>
 
-<a href="../public/dashboard.php">Home</a><br>
+<?php include '../includes/header.php'; ?>
+<?php include '../includes/body_top.php'; ?>
 
-<!-- Dynamic Add Link -->
-<a href="../student/create.php?type=<?php echo urlencode($type); ?>">
-    Add <?php echo ucfirst(rtrim($type, 's')); ?>
-</a>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css">
 
-<h3><?php echo ucfirst($type); ?> List</h3>
+<a href="create.php">Add Student</a>
 
-<table border="1" cellpadding="10">
-    <tr>
-        <th>ID</th>
-        <th>Name</th>
-        <th>Email</th>
-        <th>Action</th>
-    </tr>
-
-    <?php foreach ($users as $u): ?>
+<table id="apiDataTable" class="display" style="width:100%">
+    <thead>
         <tr>
-            <td><?php echo htmlspecialchars($u['id']); ?></td>
-            <td><?php echo htmlspecialchars($u['name']); ?></td>
-            <td><?php echo htmlspecialchars($u['email']); ?></td>
-            <td>
-                <a href="../student/update.php?id=<?php echo $u['id']; ?>">
-                    Update
-                </a>
-
-                <a href="../student/delete.php?id=<?php echo $u['id']; ?>"
-                   onclick="return confirm('Are you sure you want to delete this user?');">
-                    Delete
-                </a>
-            </td>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Actions</th>
         </tr>
-    <?php endforeach; ?>
+    </thead>
 </table>
 
-<br>
+<!-- ✅ BOOTSTRAP MODAL (FIXED) -->
+<div class="modal fade" id="apiEditModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
 
-<?php for ($i = 1; $i <= $totalPages; $i++): ?>
-    <a href="read.php?type=<?php echo urlencode($type); ?>&page=<?php echo $i; ?>">
-        <?php echo $i; ?>
-    </a>
-<?php endfor; ?>
+      <div class="modal-body">
 
-<?php
-include '../includes/body_bottom.php';
-include '../includes/footer.php';
-?>
+        <input type="hidden" id="api_id">
+
+        <input type="text" id="api_name" class="form-control mb-2" placeholder="Name">
+
+        <input type="email" id="api_email" class="form-control mb-2" placeholder="Email">
+
+        <button id="apiSaveBtn" class="btn btn-primary w-100">Save</button>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+
+<!-- IMPORTANT: Bootstrap JS (FIX for modal issue) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+const csrf = "<?= $_SESSION['csrf_token'] ?>";
+const type = "<?= $type ?>";
+
+const modal = new bootstrap.Modal(document.getElementById('apiEditModal'));
+
+const table = $('#apiDataTable').DataTable({
+    processing: true,
+    serverSide: true,
+    ajax: {
+        url: 'student_api.php',
+        type: 'GET',
+        data: function (d) {
+            d.action = 'fetch';
+            d.type = type;
+        }{ data: 'name' },
+    },
+    columns: [
+        { data: 'id' },
+        
+        { data: 'email' },
+        {
+            data: null,
+            orderable: false,
+            render: function (data, type, row) {
+                return `
+                    <button class="btn btn-sm btn-primary edit-btn"
+                        data-id="${row.id}"
+                        data-name="${row.name}"
+                        data-email="${row.email}">
+                        Edit
+                    </button>
+                    <button class="btn btn-sm btn-danger delete-btn"
+                        data-id="${row.id}">
+                        Delete
+                    </button>
+                `;
+            }
+        }
+    ]
+});
+
+$(document).on('click', '.edit-btn', function () {
+
+    $('#api_id').val($(this).data('id'));
+    $('#api_name').val($(this).data('name'));
+    $('#api_email').val($(this).data('email'));
+
+    modal.show();
+});
+
+$('#apiSaveBtn').click(function () {
+
+    $.ajax({
+        url: 'student_api.php?action=update',
+        type: 'POST',
+        dataType: 'json',
+        data: {
+            id: $('#api_id').val(),
+            name: $('#api_name').val(),
+            email: $('#api_email').val(),
+            csrf_token: csrf
+        },
+        success: function (res) {
+
+            if (res.status === 'success') {
+                modal.hide();
+                table.ajax.reload(null, false);
+            } else {
+                alert(res.message);
+            }
+        }
+    });
+});
+
+$(document).on('click', '.delete-btn', function () {
+
+    if (!confirm("Delete this user?")) return;
+
+    $.post('student_api.php?action=delete', {
+        id: $(this).data('id'),
+        csrf_token: csrf
+    }, function (res) {
+
+        if (res.status === 'success') {
+            table.ajax.reload(null, false);
+        } else {
+            alert(res.message);
+        }
+
+    }, 'json');
+});
+</script>
+
+<?php include '../includes/body_bottom.php'; ?>
+<?php include '../includes/footer.php'; ?>

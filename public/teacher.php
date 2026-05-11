@@ -162,7 +162,7 @@ $allStudents = $db->query("
 
 <section>
     <h3>Selected Course</h3>
-    <table border="1" cellpadding="8" style="width:100%; border-collapse:collapse;">
+    <table border="1" cellpadding="8" style="width:100%; border-collapse:collapse;" id="table">
         <thead>
             <tr>
                 <th>Student Name</th>
@@ -233,3 +233,32 @@ $allStudents = $db->query("
 </section>
 
 <?php include '../includes/body_bottom.php'; ?>
+
+<script>
+let table;
+
+$(document).ready(function () {
+  table = $("#table").DataTable({
+    destroy: true, // it will destroy the datatables if already exists in the table
+    "searching":true,
+    "paging":true,
+    "pageLength":5,
+    "columnDefs":[{
+        "targets":[3],
+        "orderable":true   
+    },
+    {
+      "targets":[],
+      "visible":false,
+      "searchable":true 
+    }
+  ],
+    
+    dom:'Bfrtip', 
+    
+    buttons:[
+      'copy','csv','excel','pdf','print'
+    ]
+  });
+});
+</script>

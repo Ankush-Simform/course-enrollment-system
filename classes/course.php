@@ -47,7 +47,7 @@ try {
 
 <h2>Course Catalog</h2>
 
-<table border="1" cellpadding="10" cellspacing="0" width="100%">
+<table border="1" cellpadding="10" cellspacing="0" width="100%" id="table">
     <thead>
         <tr>
             <th>ID</th>
@@ -59,7 +59,7 @@ try {
         </tr>
     </thead>
 
-    <tbody>
+    <tbody id= "tbody">
         <?php if (empty($courses)): ?>
             <tr>
                 <td colspan="6">No courses available.</td>
@@ -108,3 +108,31 @@ try {
 </div>
 
 <?php require_once '../includes/footer.php'; ?>
+<script>
+let table;
+
+$(document).ready(function () {
+  table = $("#table").DataTable({
+    destroy: true, // it will destroy the datatables if already exists in the table
+    "searching":true,
+    "paging":true,
+    "pageLength":5,
+    "columnDefs":[{
+        "targets":[3],
+        "orderable":true   
+    },
+    {
+      "targets":[],
+      "visible":false,
+      "searchable":true 
+    }
+  ],
+    
+    dom:'Bfrtip', 
+    
+    buttons:[
+      'copy','csv','excel','pdf','print'
+    ]
+  });
+});
+</script>

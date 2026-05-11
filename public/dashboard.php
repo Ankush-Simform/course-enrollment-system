@@ -169,7 +169,7 @@ while ($row = $chartStmt->fetch(PDO::FETCH_ASSOC)) {
                             <a class="collapse-item" href="signup.php">Register</a>
                             <div class="collapse-divider"></div>
                             <h6 class="collapse-header">Other Pages:</h6>
-                             <a class="collapse-item" href="../classes/upload.php">Upload Bulk Data</a>
+                            <a class="collapse-item" href="../classes/upload.php">Upload Bulk Data</a>
                             <a class="collapse-item" href="../index.php">404 Page</a>
                         </div>
                     </div>
@@ -446,13 +446,13 @@ while ($row = $chartStmt->fetch(PDO::FETCH_ASSOC)) {
                                                 <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
                                                     <a href="../student/read.php">Students</a>
                                                 </div>
+                                                <div id="main-content-area">
+                                                    <div class="text-center">
+                                                        <!-- <h4>Select a category above to view data.</h4> -->
+                                                    </div>
+                                                </div>
                                                 <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                                    <?php
-                                                    require_once '../config/database.php';
-                                                    $db = (new Database())->connect();
-                                                    $stmt = $db->query("SELECT COUNT(*) FROM users WHERE role_id=3");
-                                                    echo $stmt->fetchColumn();
-                                                    ?>
+                                                    <div id="studentCount">0</div>
                                                 </div>
                                             </div>
                                             <div class="col-auto">
@@ -472,12 +472,14 @@ while ($row = $chartStmt->fetch(PDO::FETCH_ASSOC)) {
                                                 <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
                                                     <a href="../student/read.php?type=teachers">Teachers</a>
                                                 </div>
-                                                <div class="h5 mb-0 font-weight-bold text-gray-800"> <?php
-                                                                                                        require_once '../config/database.php';
-                                                                                                        $db = (new Database())->connect();
-                                                                                                        $stmt = $db->query("SELECT COUNT(*) FROM users WHERE role_id=2");
-                                                                                                        echo $stmt->fetchColumn();
-                                                                                                        ?></div>
+                                                <div id="main-content-area">
+                                                    <div class="text-center">
+                                                        <!-- <h4>Select a category above to view data.</h4> -->
+                                                    </div>
+                                                </div>
+                                                <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                                    <div id="teacherCount">0</div>
+                                                </div>
                                             </div>
                                             <div class="col-auto">
                                                 <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
@@ -494,18 +496,19 @@ while ($row = $chartStmt->fetch(PDO::FETCH_ASSOC)) {
                                         <div class="row no-gutters align-items-center">
                                             <div class="col mr-2">
                                                 <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                                                    <a href="../classes/course.php?type=teachers">Course</a>
+                                                    <a href="../courses/course.php?type=teachers">Course</a>
 
+                                                    
+                                                </div>
+                                                <div id="main-content-area">
+                                                    <div class="text-center">
+                                                        <!-- <h4>Select a category above to view data.</h4> -->
+                                                    </div>
                                                 </div>
                                                 <div class="row no-gutters align-items-center">
                                                     <div class="col-auto">
                                                         <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">
-                                                            <?php
-                                                            require_once '../config/database.php';
-                                                            $db = (new Database())->connect();
-                                                            $stmt = $db->query("SELECT COUNT(*) FROM courses");
-                                                            echo $stmt->fetchColumn();
-                                                            ?>
+                                                            <div id="courseCount">0</div>
                                                         </div>
                                                     </div>
                                                     <div class="col">
@@ -534,13 +537,13 @@ while ($row = $chartStmt->fetch(PDO::FETCH_ASSOC)) {
                                                 <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
                                                     <a href="../classes/manage_enrollments.php?type=teachers">Enrollments</a>
                                                 </div>
+                                                <div id="main-content-area">
+                                                    <div class="text-center">
+                                                        <!-- <h4>Select a category above to view data.</h4> -->
+                                                    </div>
+                                                </div>
                                                 <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                                    <?php
-                                                    require_once '../config/database.php';
-                                                    $db = (new Database())->connect();
-                                                    $stmt = $db->query("SELECT COUNT(*) FROM enrollments");
-                                                    echo $stmt->fetchColumn();
-                                                    ?>
+                                                    <div id="enrollmentCount">0</div>
                                                 </div>
                                             </div>
                                             <div class="col-auto">
@@ -552,7 +555,7 @@ while ($row = $chartStmt->fetch(PDO::FETCH_ASSOC)) {
                             </div>
                         </div>
 
-                        <!-- Content Row -->
+
 
                         <div class="row">
 
@@ -735,7 +738,7 @@ while ($row = $chartStmt->fetch(PDO::FETCH_ASSOC)) {
                     maintainAspectRatio: false, // Allows it to stretch to the new big box
                     legend: {
                         display: true,
-                        position: 'right' // Moving legend to the right looks better on wide screens
+                        position: 'right'
                     }
                 }
             });
@@ -743,3 +746,47 @@ while ($row = $chartStmt->fetch(PDO::FETCH_ASSOC)) {
     </body>
 
 </html>
+<script>
+$(document).ready(function() {
+
+    function updateCounts() {
+        $.getJSON('api/dashboard_stats.php', function(res) {
+            $('#studentCount').text(res.students);
+            $('#teacherCount').text(res.teachers);
+            $('#courseCount').text(res.courses);
+            $('#enrollmentCount').text(res.enrollments);
+        }).fail(function() {
+            console.error("Count API failed to load.");
+        });
+    }
+
+    updateCounts();
+
+    $(document).on('click', '.ajax-link', function(e) {
+        e.preventDefault(); 
+        
+        let targetUrl = $(this).attr('href');
+        let displayArea = $('#main-content-area');
+
+        displayArea.html('<div class="text-center"><i class="fas fa-spinner fa-spin fa-3x"></i><p>Loading...</p></div>');
+
+        $.ajax({
+            url: targetUrl,
+            method: 'GET',
+
+            headers: {'X-Requested-With': 'XMLHttpRequest'}, 
+            success: function(response) {
+
+            displayArea.html(response);
+                
+                updateCounts();
+            },
+            error: function() {
+                displayArea.html('<div class="alert alert-danger">Failed to load the list. Check console for details.</div>');
+            }
+        });
+    });
+});
+
+
+</script>
